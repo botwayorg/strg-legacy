@@ -1,6 +1,7 @@
-use super::tools::return_path;
+use super::tools::{get_home_dir, return_path};
 use super::watch::watch;
 use owo_colors::OwoColorize;
+use std::fs;
 use std::path::Path;
 use std::process::Command;
 
@@ -26,12 +27,36 @@ pub fn check_dir(db: &String) {
 
     if !check_db_dir {
         if check_repo.contains("Not Found") {
-            Command::new("cd").arg(return_path(db));
+            match fs::create_dir(&return_path(db)) {
+                Ok(_) => println!("Directory created successfully."),
+                Err(e) => println!("Error creating directory: {:?}", e),
+            }
 
-            let cmd = Command::new("gh")
-                .args(["repo", "create", &dbx.to_string(), "--private", "--clone"])
+            Command::new("git")
+                .args(["init"])
+                .current_dir(&return_path(db))
                 .output()
                 .unwrap();
+
+            Command::new("git")
+                .args(["branch", "-m", "main"])
+                .current_dir(&return_path(db))
+                .output()
+                .unwrap();
+
+            let cmd = Command::new("gh")
+                .args([
+                    "repo",
+                    "create",
+                    &dbx.to_string(),
+                    "--private",
+                    "--source",
+                    &return_path(db),
+                ])
+                .current_dir(get_home_dir())
+                .output()
+                .unwrap();
+
             let gh = String::from_utf8(cmd.stdout)
                 .unwrap()
                 .trim_end()
@@ -41,14 +66,10 @@ pub fn check_dir(db: &String) {
 
             println!("{}", gh.bright_green());
         } else {
-            let cmd = Command::new("gh")
+            let _ = Command::new("gh")
                 .args(["repo", "clone", &dbx.to_string(), &return_path(db)])
                 .output()
                 .unwrap();
-            String::from_utf8(cmd.stdout)
-                .unwrap()
-                .trim_end()
-                .to_string();
 
             println!("{}", "Cloned Successfully".bright_green());
 

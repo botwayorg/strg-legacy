@@ -1,7 +1,50 @@
 use super::{strg::check_dir, tools::return_path};
+use git2::{BranchType, Repository};
 use notify::*;
 use owo_colors::OwoColorize;
+use std::process::Command;
 use std::{path::Path, time::Duration};
+
+fn work(db: &String) {
+    Command::new("git")
+        .arg("add")
+        .arg(".")
+        .current_dir(&return_path(db))
+        .output()
+        .unwrap();
+
+    Command::new("git")
+        .arg("commit")
+        .arg("-m")
+        .arg("\"New Changes\"")
+        .current_dir(&return_path(db))
+        .output()
+        .unwrap();
+
+    let repo = Repository::open(&return_path(db)).unwrap();
+
+    let branch = repo.head().unwrap();
+    let branch_name = branch
+        .shorthand()
+        .expect("Failed to get current branch name");
+
+    let upstream = repo.find_branch(&format!("origin/{}", branch_name), BranchType::Remote);
+    if upstream.is_err() {
+        Command::new("git")
+            .args(["push", "-u", "origin", "main"])
+            .current_dir(&return_path(db))
+            .output()
+            .unwrap();
+    } else {
+        Command::new("git")
+            .arg("push")
+            .current_dir(&return_path(db))
+            .output()
+            .unwrap();
+    }
+
+    println!("{}", "Changes Saved".bright_magenta());
+}
 
 pub fn watch(db: &String) {
     let (tx, rx) = std::sync::mpsc::channel();
@@ -28,7 +71,7 @@ pub fn watch(db: &String) {
 
         for e in rx {
             if e.is_ok() {
-                println!("{:?}", e)
+                work(db);
             }
         }
     } else {
@@ -43,11 +86,7 @@ pub fn watch(db: &String) {
 
         for e in rx {
             if e.is_ok() {
-                // gitx(db);
-                println!(
-                    "{}",
-                    &(".".to_owned() + &db.to_string().to_owned() + " is Changed")
-                )
+                work(db);
             }
         }
     }
