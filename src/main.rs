@@ -1,4 +1,4 @@
-use ::clap::{Parser, Subcommand, Args};
+use ::clap::{Args, Parser, Subcommand};
 
 mod core;
 
@@ -29,18 +29,15 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Commands::Sync(name)) => {
-            match name.db {
-                Some(ref _name) => {
-                    let db = core::strg::sync(_name);
-                    println!("{}", db);
-                }
-
-                None => {
-                    println!("Please provide a database name");
-                }
+        Some(Commands::Sync(name)) => match name.db {
+            Some(ref _name) => {
+                core::strg::sync(_name);
             }
-        }
+
+            None => {
+                println!("Please provide a database name");
+            }
+        },
 
         None => {}
     }
