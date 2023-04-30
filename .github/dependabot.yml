@@ -2,7 +2,8 @@ version: 2
 updates:
   - package-ecosystem: "cargo"
     directory: "/"
-   schedule:
+    schedule:
       interval: "daily"
     reviewers:
       - abdfnx
+      - david-tomson
