@@ -1,0 +1,6 @@
+{
+  "name": "strg-cmd",
+  "scripts": {
+    "start": "$CMD"
+  }
+}

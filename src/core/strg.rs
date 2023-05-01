@@ -85,3 +85,20 @@ pub fn check_dir(db: &String) {
 pub fn sync(db: &String) {
     watch(db);
 }
+
+pub fn init() {
+    Command::new("gh")
+        .args(["auth", "setup-git"])
+        .output()
+        .unwrap();
+
+    Command::new("wget")
+        .arg("https://raw.githubusercontent.com/botwayorg/strg/main/package.json")
+        .output()
+        .unwrap();
+
+    Command::new("wget")
+        .arg("https://raw.githubusercontent.com/botwayorg/strg/main/turbo.json")
+        .output()
+        .unwrap();
+}

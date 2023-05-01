@@ -1,0 +1,13 @@
+{
+  "name": "strg",
+  "scripts": {
+    "start": "turbo run start --parallel"
+  },
+  "workspaces": [
+    "runner",
+    "runner/cmd"
+  ],
+  "devDependencies": {
+    "turbo": "^1.9.3"
+  }
+}

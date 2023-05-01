@@ -17,6 +17,9 @@ struct Cli {
 enum Commands {
     /// Sync your Database files
     Sync(Sync),
+
+    /// Setup Config
+    Init(Init),
 }
 
 #[derive(Args)]
@@ -24,6 +27,9 @@ struct Sync {
     /// Database Name
     db: Option<String>,
 }
+
+#[derive(Args)]
+struct Init {}
 
 fn main() {
     let cli = Cli::parse();
@@ -40,5 +46,7 @@ fn main() {
         },
 
         None => {}
+
+        Some(Commands::Init(_)) => core::strg::init()
     }
 }

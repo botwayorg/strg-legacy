@@ -16,7 +16,7 @@ fn work(db: &String) {
     Command::new("git")
         .arg("commit")
         .arg("-m")
-        .arg("\"New Changes\"")
+        .arg("New Changes")
         .current_dir(&return_path(db))
         .output()
         .unwrap();
