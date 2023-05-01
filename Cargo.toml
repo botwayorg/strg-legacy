@@ -2,6 +2,13 @@
 name = "strg"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+authors = ["Botway"]
+description = "📦 A persistent storage solution that syncs database files located in a Docker container under your GitHub account"
+readme = "README.md"
+homepage = "https://github.com/botwayorg/strg"
+repository = "https://github.com/botwayorg/strg"
+include = ["src/**/*", "LICENSE", "README.md"]
 
 [dependencies]
 clap = { version = "4.2.5", features = ["derive"] }
