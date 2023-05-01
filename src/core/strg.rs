@@ -28,7 +28,7 @@ pub fn check_dir(db: &String) {
     if !check_db_dir {
         if check_repo.contains("Not Found") {
             match fs::create_dir(&return_path(db)) {
-                Ok(_) => println!("Directory created successfully."),
+                Ok(_) => println!("{}", "Directory created successfully.".bright_green()),
                 Err(e) => println!("Error creating directory: {:?}", e),
             }
 
@@ -101,4 +101,30 @@ pub fn init() {
         .arg("https://raw.githubusercontent.com/botwayorg/strg/main/turbo.json")
         .output()
         .unwrap();
+
+    match fs::create_dir("./runner") {
+        Ok(_) => {
+            println!("{}", "Directory created successfully.".bright_green());
+
+            Command::new("wget")
+                .arg("https://raw.githubusercontent.com/botwayorg/strg/main/runner/package.json")
+                .current_dir("./runner")
+                .output()
+                .unwrap();
+        }
+        Err(e) => println!("Error creating directory: {:?}", e),
+    }
+
+    match fs::create_dir("./runner/cmd") {
+        Ok(_) => {
+            println!("{}", "Directory created successfully.".bright_green());
+
+            Command::new("wget")
+                .arg("https://raw.githubusercontent.com/botwayorg/strg/main/runner/cmd/package.json")
+                .current_dir("./runner/cmd")
+                .output()
+                .unwrap();
+        }
+        Err(e) => println!("Error creating directory: {:?}", e),
+    }
 }
