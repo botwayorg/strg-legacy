@@ -5,7 +5,7 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-pub fn check_dir(db: &String) {
+pub fn check_dir(db: &String, no_watch: bool) {
     println!("{}", "Checking Directory...".yellow());
 
     let dbx = &(".".to_owned() + &db.to_string().to_owned());
@@ -62,7 +62,9 @@ pub fn check_dir(db: &String) {
                 .trim_end()
                 .to_string();
 
-            watch(db);
+            if !no_watch {
+                watch(db);
+            }
 
             println!("{}", gh.bright_green());
         } else {
@@ -73,22 +75,34 @@ pub fn check_dir(db: &String) {
 
             println!("{}", "Cloned Successfully".bright_green());
 
-            watch(db);
+            Command::new("git")
+                .arg("pull")
+                .current_dir(&return_path(db))
+                .output()
+                .unwrap();
+
+            if !no_watch {
+                watch(db);
+            }
         }
     } else {
         println!("{}", "Directory found".bright_green());
 
-        watch(db);
+        if !no_watch {
+            watch(db);
+        }
     }
 }
 
 pub fn sync(db: &String) {
+    init();
+
     watch(db);
 }
 
 pub fn init() {
-    Command::new("gh")
-        .args(["auth", "setup-git"])
+    Command::new("git")
+        .args(["config", "--global", "user.name", "Botway App"])
         .output()
         .unwrap();
 
@@ -120,11 +134,17 @@ pub fn init() {
             println!("{}", "Directory created successfully.".bright_green());
 
             Command::new("wget")
-                .arg("https://raw.githubusercontent.com/botwayorg/strg/main/runner/cmd/package.json")
+                .arg(
+                    "https://raw.githubusercontent.com/botwayorg/strg/main/runner/cmd/package.json",
+                )
                 .current_dir("./runner/cmd")
                 .output()
                 .unwrap();
         }
         Err(e) => println!("Error creating directory: {:?}", e),
     }
+
+    let db = std::env::var("DB").expect("DB env variable is required");
+
+    check_dir(&db, true);
 }

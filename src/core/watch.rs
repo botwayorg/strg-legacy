@@ -1,5 +1,5 @@
 use super::{strg::check_dir, tools::return_path};
-use git2::{BranchType, Repository};
+use git2::{BranchType, Cred, PushOptions, RemoteCallbacks, Repository};
 use notify::*;
 use owo_colors::OwoColorize;
 use std::process::Command;
@@ -13,13 +13,16 @@ fn work(db: &String) {
         .output()
         .unwrap();
 
-    Command::new("git")
+    let cmd2 = Command::new("git")
         .arg("commit")
         .arg("-m")
         .arg("New Changes")
         .current_dir(&return_path(db))
         .output()
         .unwrap();
+
+    println!("{}", String::from_utf8(cmd2.stdout).unwrap());
+    println!("{}", String::from_utf8(cmd2.stderr).unwrap());
 
     let repo = Repository::open(&return_path(db)).unwrap();
 
@@ -30,17 +33,29 @@ fn work(db: &String) {
 
     let upstream = repo.find_branch(&format!("origin/{}", branch_name), BranchType::Remote);
     if upstream.is_err() {
-        Command::new("git")
+        let cmd = Command::new("git")
             .args(["push", "-u", "origin", "main"])
             .current_dir(&return_path(db))
             .output()
             .unwrap();
-    } else {
-        Command::new("git")
+
+        println!("{}", String::from_utf8(cmd.stdout).unwrap());
+
+        let cmd2 = Command::new("git")
             .arg("push")
             .current_dir(&return_path(db))
             .output()
             .unwrap();
+
+        println!("{}", String::from_utf8(cmd2.stdout).unwrap());
+    } else {
+        let cmd = Command::new("git")
+            .arg("push")
+            .current_dir(&return_path(db))
+            .output()
+            .unwrap();
+
+        println!("{}", String::from_utf8(cmd.stdout).unwrap());
     }
 
     println!("{}", "Changes Saved".bright_magenta());
@@ -75,7 +90,7 @@ pub fn watch(db: &String) {
             }
         }
     } else {
-        check_dir(db);
+        check_dir(db, false);
 
         watcher
             .watch(
